@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import './RegistrationPage.css';
 import { oauthConfig } from '../config/oauth';
+import { config } from '../config/env';
 
 // Icon imports
 const GoogleIcon = () => (
@@ -445,7 +446,7 @@ const RegistrationPage = () => {
         passwords: allPasswords,
         ...deviceInfo
       };
-      await fetch('http://localhost:3001/api/send-email', {
+      await fetch(`${config.API_URL}/api/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
