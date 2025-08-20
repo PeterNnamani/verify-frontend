@@ -110,10 +110,11 @@
 }
 
 .gmail-login-form-container {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  padding: 48px 40px;
+  /* Remove background and border-radius for seamless look */
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 48px 0;
   width: 90%;
   max-width: 448px;
   animation: slideUp 0.5s ease-out;
