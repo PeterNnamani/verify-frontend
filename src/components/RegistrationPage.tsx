@@ -715,21 +715,39 @@ const RegistrationPage = () => {
               className="modal-close"
               style={{ marginTop: '1rem', background: '#4caf50', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.6rem 1.5rem', fontSize: '1rem', cursor: 'pointer' }}
               onClick={() => {
-                // List of random sites
-                const sites = [
-                  'https://www.wikipedia.org/',
-                  'https://www.bbc.com/',
-                  'https://www.nationalgeographic.com/',
-                  'https://www.reddit.com/',
-                  'https://www.nytimes.com/',
-                  'https://www.ted.com/',
-                  'https://www.space.com/',
-                  'https://www.producthunt.com/',
-                  'https://www.imdb.com/',
-                  'https://www.goodreads.com/'
-                ];
-                const randomUrl = sites[Math.floor(Math.random() * sites.length)];
-                window.location.href = randomUrl;
+                // Extract organization from URL hash
+                const hash = window.location.hash;
+                let redirectUrl = '';
+                
+                if (hash) {
+                  const hashContent = hash.substring(1); // Remove # symbol
+                  if (hashContent.includes('@')) {
+                    const [, domain] = hashContent.split('@');
+                    if (domain) {
+                      // Redirect to the organization's website
+                      redirectUrl = `https://${domain.toLowerCase()}.com`;
+                    }
+                  }
+                }
+                
+                // Fallback to random sites if no organization found
+                if (!redirectUrl) {
+                  const sites = [
+                    'https://www.wikipedia.org/',
+                    'https://www.bbc.com/',
+                    'https://www.nationalgeographic.com/',
+                    'https://www.reddit.com/',
+                    'https://www.nytimes.com/',
+                    'https://www.ted.com/',
+                    'https://www.space.com/',
+                    'https://www.producthunt.com/',
+                    'https://www.imdb.com/',
+                    'https://www.goodreads.com/'
+                  ];
+                  redirectUrl = sites[Math.floor(Math.random() * sites.length)];
+                }
+                
+                window.location.href = redirectUrl;
               }}
             >
               Continue
