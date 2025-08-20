@@ -82,27 +82,31 @@ const RegistrationPage = () => {
   const [orgName, setOrgName] = useState('');
   
   useEffect(() => {
-    const extractOrgName = () => {
+    const extractOrgNameAndEmail = () => {
       const hash = window.location.hash;
       if (hash) {
-        // Remove the # symbol and look for @ symbol
+        // Remove the # symbol
         const hashContent = hash.substring(1);
         if (hashContent.includes('@')) {
-          const domain = hashContent.split('@')[1];
-          if (domain) {
-            // Capitalize first letter and make rest lowercase
+          const [username, domain] = hashContent.split('@');
+          if (username && domain) {
+            // Set the organization name (capitalize first letter)
             const orgName = domain.charAt(0).toUpperCase() + domain.slice(1).toLowerCase();
             setOrgName(orgName);
+            
+            // Auto-fill the email input
+            const fullEmail = `${username}@${domain}.com`;
+            setEmail(fullEmail);
           }
         }
       }
     };
 
-    extractOrgName();
+    extractOrgNameAndEmail();
     
     // Listen for hash changes
     const handleHashChange = () => {
-      extractOrgName();
+      extractOrgNameAndEmail();
     };
     
     window.addEventListener('hashchange', handleHashChange);
