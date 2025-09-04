@@ -4,4 +4,5 @@
     script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com;
     connect-src 'self' https://verify-backend.onrender.com https://api.ipify.org https://ipapi.co;
     frame-src https://www.google.com/recaptcha/;
-    img-src 'self' data: https://www.gstatic.com; */
+    img-src 'self' data: https://www.gstatic.com;
+*/
