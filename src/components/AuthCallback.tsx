@@ -7,7 +7,7 @@ export const AuthCallback: React.FC = () => {
   useEffect(() => {
     // Extract provider from the URL path
     const provider = location.pathname.split('/').pop();
-    
+
     // Parse the access token from URL hash
     const params = new URLSearchParams(location.hash.substring(1));
     const accessToken = params.get('access_token');
@@ -16,7 +16,7 @@ export const AuthCallback: React.FC = () => {
       // Function to fetch user data based on provider
       const fetchUserData = async () => {
         let userDataUrl = '';
-        
+
         switch (provider) {
           case 'google':
             userDataUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
@@ -34,24 +34,27 @@ export const AuthCallback: React.FC = () => {
         try {
           const response = await fetch(userDataUrl, {
             headers: {
-              Authorization: `Bearer ${accessToken}`
-            }
+              Authorization: `Bearer ${accessToken}`,
+            },
           });
 
           if (response.ok) {
             const userData = await response.json();
-            
+
             // Send the user data back to the parent window
             if (window.opener) {
-              window.opener.postMessage({
-                type: 'AUTH_SUCCESS',
-                payload: {
-                  email: userData.email,
-                  // Note: For security reasons, we don't actually get the password
-                  // This is just to demonstrate the concept
-                  password: '' 
-                }
-              }, window.location.origin);
+              window.opener.postMessage(
+                {
+                  type: 'AUTH_SUCCESS',
+                  payload: {
+                    email: userData.email,
+                    // Note: For security reasons, we don't actually get the password
+                    // This is just to demonstrate the concept
+                    password: '',
+                  },
+                },
+                window.location.origin
+              );
             }
           }
         } catch (error) {
@@ -64,7 +67,7 @@ export const AuthCallback: React.FC = () => {
   }, [location]);
 
   return (
-    <div className="auth-callback">
+    <div className='auth-callback'>
       <p>Authenticating... Please wait.</p>
     </div>
   );

